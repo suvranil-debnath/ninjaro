@@ -37,7 +37,7 @@ export default function CheckoutPage() {
             <div className="w-10 h-10 rounded-full bg-white/50 backdrop-blur-md border border-emerald-900/10 flex items-center justify-center group-hover:bg-emerald-900 group-hover:text-white transition-all">
               <span className="material-symbols-outlined text-xl">arrow_back</span>
             </div>
-            <span className="font-black italic text-2xl md:text-4xl tracking-tighter hidden sm:inline leading-none">NINJIRO✧</span>
+            <span className="font-black italic text-2xl md:text-4xl tracking-tighter hidden sm:inline leading-none">Ninjaro✧</span>
           </Link>
         </div>
 

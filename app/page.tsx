@@ -1,6 +1,50 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { ProductCard } from '../components/ProductCard';
+
+const PRODUCTS = [
+  {
+    name: 'Blue Lagoon',
+    description: 'Natural blueberry extracts, sparkling spring water, and a hint of wild lavender.',
+    price: '₹666/-',
+    imageSrc: '/blulagoonbox.png',
+    imageAlt: 'blue tropical drink',
+    topBgColor: 'bg-[#00485c]',
+    bottomBgColor: 'bg-[#006884]',
+    buttonTextColor: 'text-[#006884]',
+  },
+  {
+    name: 'Green Mango',
+    description: 'Real citrus pulp, unripe mango nectar, and a whisper of Himalayan salt.',
+    price: '₹666/-',
+    imageSrc: '/greentangbox.png',
+    imageAlt: 'green mango drink',
+    topBgColor: 'bg-[#004930]',
+    bottomBgColor: 'bg-[#00704a]',
+    buttonTextColor: 'text-[#00704a]',
+  },
+  {
+    name: 'Orange Tang',
+    description: 'Blood orange concentrate, cold-pressed ginger, and sparkling tangerine water.',
+    price: '₹666/-',
+    imageSrc: '/orangetangbox.png',
+    imageAlt: 'orange tang drink',
+    topBgColor: 'bg-[#ff9500]',
+    bottomBgColor: 'bg-[#e87903]',
+    buttonTextColor: 'text-[#ff9500]',
+  },
+  {
+    name: 'Virgin Mojito',
+    description: 'Fresh garden mint, hand-squeezed lime, and artisanal agave nectar syrup.',
+    price: '₹666/-',
+    imageSrc: '/virginmojitobox.png',
+    imageAlt: 'virgin mojito drink',
+    topBgColor: 'bg-[#1b8858]',
+    bottomBgColor: 'bg-[#25b07a]',
+    buttonTextColor: 'text-[#2fd696]',
+  }
+];
 
 const REVIEWS = [
   {
@@ -21,11 +65,13 @@ const REVIEWS = [
 ];
 
 export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [cartItems, setCartItems] = useState<{name: string, price: string, img: string, quantity: number}[]>([]);
   const [currentReview, setCurrentReview] = useState(0);
+
+  const text1Ref = useRef<HTMLHeadingElement>(null);
+  const text2Ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -63,10 +109,33 @@ export default function Home() {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          
+          if (text1Ref.current) {
+            text1Ref.current.style.opacity = String(Math.max(0, 1 - scrollY / 300));
+            text1Ref.current.style.transform = `translateY(${-Math.min(scrollY, 300) * 0.5}px)`;
+          }
+
+          if (text2Ref.current) {
+            text2Ref.current.style.opacity = String(scrollY < 300 ? 0 : Math.min(1, (scrollY - 300) / 300));
+            text2Ref.current.style.transform = `translateY(${scrollY < 300 ? 100 : Math.max(0, 100 - ((scrollY - 300) / 300) * 100)}px)`;
+          }
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener("scroll", handleScroll);
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Initialize position
+    handleScroll();
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -113,10 +182,9 @@ export default function Home() {
     
     <div className="relative w-full h-[300px] md:h-[400px] flex justify-center items-start mt-10 z-10">
       <h1 
+        ref={text1Ref}
         className="absolute top-0 text-6xl md:text-8xl lg:text-9xl font-black text-white text-center tracking-tighter drop-shadow-2xl uppercase"
         style={{
-          opacity: Math.max(0, 1 - scrollY / 300),
-          transform: `translateY(${-Math.min(scrollY, 300) * 0.5}px)`,
           transition: 'opacity 0.1s ease-out, transform 0.1s ease-out'
         }}
       >
@@ -124,14 +192,15 @@ export default function Home() {
       </h1>
 
       <h1 
+        ref={text2Ref}
         className="absolute top-15 text-6xl md:text-8xl lg:text-9xl font-black text-white text-center tracking-tighter drop-shadow-2xl uppercase"
         style={{
-          opacity: scrollY < 300 ? 0 : Math.min(1, (scrollY - 300) / 300),
-          transform: `translateY(${scrollY < 300 ? 100 : Math.max(0, 100 - ((scrollY - 300) / 300) * 100)}px)`,
+          opacity: 0,
+          transform: 'translateY(100px)',
           transition: 'opacity 0.1s ease-out, transform 0.1s ease-out'
         }}
       >
-        NINJIRO✧
+        Ninjaro✧
       </h1>
     </div>
 
@@ -155,197 +224,118 @@ export default function Home() {
 </div>
 </div>
 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-{/**/}
-<div className="group flex flex-col rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 shadow-xl hover:shadow-2xl bg-white font-poppins">
-  <div className="bg-[#00485c] relative h-72 p-6 flex justify-center items-center">
-    <img className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 drop-shadow-xl" data-alt="blue tropical drink" src="/blulagoonbox.png"/>
-  </div>
-  <div className="bg-[#006884] p-6 flex flex-col justify-between text-white grow">
-    <div>
-      <h3 className="text-2xl font-black italic uppercase mb-2 tracking-widest">Blue Lagoon</h3>
-      <p className="text-xs text-white/90 leading-tight">Natural blueberry extracts, sparkling spring water, and a hint of wild lavender.</p>
-    </div>
-    <div className="mt-6 flex items-center justify-between">
-      <span className="text-xl font-bold tracking-wider">₹666/-</span>
-      {getItemQuantity('Blue Lagoon') > 0 ? (
-        <div className="bg-white text-[#006884] h-10 rounded-full flex items-center shadow-md overflow-hidden">
-          <button onClick={() => updateQuantity('Blue Lagoon', -1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
-          </button>
-          <span className="w-6 text-center font-bold text-sm">{getItemQuantity('Blue Lagoon')}</span>
-          <button onClick={() => updateQuantity('Blue Lagoon', 1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="add">add</span>
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => addToCart({name: 'Blue Lagoon', price: '₹666/-', img: '/blulagoonbox.png'})} className="bg-white text-[#006884] w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform active:scale-95 transform shadow-md">
-          <span className="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
-        </button>
-      )}
-    </div>
-  </div>
-</div>
-{/**/}
-<div className="group flex flex-col rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 shadow-xl hover:shadow-2xl bg-white font-poppins">
-  <div className="bg-[#004930] relative h-72 p-6 flex justify-center items-center">
-    <img className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 drop-shadow-xl" data-alt="green mango drink" src="/greentangbox.png"/>
-  </div>
-  <div className="bg-[#00704a] p-6 flex flex-col justify-between text-white grow">
-    <div>
-      <h3 className="text-2xl font-black italic uppercase mb-2 tracking-widest">Green Mango</h3>
-      <p className="text-xs text-white/90 leading-tight">Real citrus pulp, unripe mango nectar, and a whisper of Himalayan salt.</p>
-    </div>
-    <div className="mt-6 flex items-center justify-between">
-      <span className="text-xl font-bold tracking-wider">₹666/-</span>
-      {getItemQuantity('Green Mango') > 0 ? (
-        <div className="bg-white text-[#00704a] h-10 rounded-full flex items-center shadow-md overflow-hidden">
-          <button onClick={() => updateQuantity('Green Mango', -1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
-          </button>
-          <span className="w-6 text-center font-bold text-sm">{getItemQuantity('Green Mango')}</span>
-          <button onClick={() => updateQuantity('Green Mango', 1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="add">add</span>
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => addToCart({name: 'Green Mango', price: '₹666/-', img: '/greentangbox.png'})} className="bg-white text-[#00704a] w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform active:scale-95 transform shadow-md">
-          <span className="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
-        </button>
-      )}
-    </div>
-  </div>
-</div>
-{/**/}
-<div className="group flex flex-col rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 shadow-xl hover:shadow-2xl bg-white font-poppins">
-  <div className="bg-[#ff9500] relative h-72 p-6 flex justify-center items-center">
-    <img className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 drop-shadow-xl" data-alt="orange tang drink" src="/orangetangbox.png"/>
-  </div>
-  <div className="bg-[#e87903] p-6 flex flex-col justify-between text-white grow">
-    <div>
-      <h3 className="text-2xl font-black italic uppercase mb-2 tracking-widest">Orange Tang</h3>
-      <p className="text-xs text-white/90 leading-tight">Blood orange concentrate, cold-pressed ginger, and sparkling tangerine water.</p>
-    </div>
-    <div className="mt-6 flex items-center justify-between">
-      <span className="text-xl font-bold tracking-wider">₹666/-</span>
-      {getItemQuantity('Orange Tang') > 0 ? (
-        <div className="bg-white text-[#ff9500] h-10 rounded-full flex items-center shadow-md overflow-hidden">
-          <button onClick={() => updateQuantity('Orange Tang', -1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
-          </button>
-          <span className="w-6 text-center font-bold text-sm">{getItemQuantity('Orange Tang')}</span>
-          <button onClick={() => updateQuantity('Orange Tang', 1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="add">add</span>
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => addToCart({name: 'Orange Tang', price: '₹666/-', img: '/orangetangbox.png'})} className="bg-white text-[#ff9500] w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform active:scale-95 transform shadow-md">
-          <span className="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
-        </button>
-      )}
-    </div>
-  </div>
-</div>
-{/**/}
-<div className="group flex flex-col rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 shadow-xl hover:shadow-2xl bg-white font-poppins">
-  <div className="bg-[#1b8858] relative h-72 p-6 flex justify-center items-center">
-    <img className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 drop-shadow-xl" data-alt="virgin mojito drink" src="/virginmojitobox.png"/>
-  </div>
-  <div className="bg-[#25b07a] p-6 flex flex-col justify-between text-white grow">
-    <div>
-      <h3 className="text-2xl font-black italic uppercase mb-2 tracking-widest">Virgin Mojito</h3>
-      <p className="text-xs text-white/90 leading-tight">Fresh garden mint, hand-squeezed lime, and artisanal agave nectar syrup.</p>
-    </div>
-    <div className="mt-6 flex items-center justify-between">
-      <span className="text-xl font-bold tracking-wider">₹666/-</span>
-      {getItemQuantity('Virgin Mojito') > 0 ? (
-        <div className="bg-white text-[#2fd696] h-10 rounded-full flex items-center shadow-md overflow-hidden">
-          <button onClick={() => updateQuantity('Virgin Mojito', -1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
-          </button>
-          <span className="w-6 text-center font-bold text-sm">{getItemQuantity('Virgin Mojito')}</span>
-          <button onClick={() => updateQuantity('Virgin Mojito', 1)} className="w-8 h-full flex items-center justify-center hover:bg-black/5 transition-colors">
-            <span className="material-symbols-outlined text-[18px]" data-icon="add">add</span>
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => addToCart({name: 'Virgin Mojito', price: '₹666/-', img: '/virginmojitobox.png'})} className="bg-white text-[#2fd696] w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform active:scale-95 transform shadow-md">
-          <span className="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
-        </button>
-      )}
-    </div>
-  </div>
-</div>
+  {PRODUCTS.map((product) => (
+    <ProductCard
+      key={product.name}
+      name={product.name}
+      description={product.description}
+      price={product.price}
+      imageSrc={product.imageSrc}
+      imageAlt={product.imageAlt}
+      topBgColor={product.topBgColor}
+      bottomBgColor={product.bottomBgColor}
+      buttonTextColor={product.buttonTextColor}
+      quantity={getItemQuantity(product.name)}
+      onAddToCart={() => addToCart({ name: product.name, price: product.price, img: product.imageSrc })}
+      onUpdateQuantity={(delta) => updateQuantity(product.name, delta)}
+    />
+  ))}
 </div>
 </div>
 </section>
-{/**/}
-<section className="py-40 px-6 md:px-12 relative overflow-hidden bg-emerald-50/50">
-  {/* Sophisticated Ambient Background */}
-  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-200/20 rounded-full blur-[150px] pointer-events-none"></div>
-  
-  <div className="max-w-screen-2xl mx-auto relative z-10">
-    <div className="flex flex-col items-center text-center space-y-6 mb-24">
-      <h2 className="font-limelight text-6xl md:text-8xl text-emerald-950 tracking-tighter uppercase leading-none">
-        Botanical<br/><span className="text-emerald-600 italic">Mastery</span>
-      </h2>
-      <p className="text-emerald-900/60 font-black tracking-[0.3em] uppercase text-xs">The science of the perfect sip</p>
-    </div>
 
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-      {/* Detail Card 1 */}
-      <div className="lg:col-span-3 space-y-8 order-2 lg:order-1">
-        <div className="glass-panel bg-white/40 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-xl hover:-rotate-2 transition-all duration-500 group">
-          <div className="w-14 h-14 bg-emerald-900 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-900/20 group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined text-2xl">eco</span>
-          </div>
-          <h3 className="text-2xl font-black text-emerald-950 tracking-tight mb-4">Pure Essence</h3>
-          <p className="text-sm font-medium text-emerald-900/60 leading-relaxed">
-            Cold-pressed botanical extracts sourced from the world's most vibrant ecosystems. Zero synthetic additives.
-          </p>
+<section className="py-32 px-6 md:px-12 bg-white relative overflow-hidden font-poppins">
+  {/* Header */}
+  <header className="max-w-4xl mx-auto text-center mb-32 relative">
+    <div className="absolute inset-0 bg-emerald-50/80 backdrop-blur-3xl rounded-[3rem] -z-10 transform -rotate-2 scale-105"></div>
+    <h2 className="font-limelight text-5xl md:text-7xl tracking-tighter text-emerald-950 mb-6 leading-none uppercase">
+      The 30-Second <br/>
+      <span className="text-emerald-600 italic">Ritual</span>
+    </h2>
+    <p className="text-lg md:text-xl text-emerald-900/70 max-w-2xl mx-auto leading-relaxed font-medium">
+      Transform any moment into an occasion. A meticulously crafted experience that requires nothing more than water, ice, and a moment of anticipation.
+    </p>
+  </header>
+
+  <div className="max-w-screen-xl mx-auto relative space-y-32 md:space-y-48">
+    {/* Step 01 */}
+    <article className="relative flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+      <div className="absolute -left-8 md:-left-24 top-0 md:-top-16 text-[8rem] md:text-[14rem] font-black text-emerald-50 select-none z-0 tracking-tighter">01</div>
+      
+      <div className="w-full md:w-5/12 relative z-10 group">
+        <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative">
+          <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Preparation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy4Fl0CLLUldmlFqc9t_p8x9GNpV3njZbRfd_ufqjfGuCrzOLvSuNx7xAc6sAFmiNAvMWX2EZz6Glug9ObwPJq90AAMt1PhGeQTSlB2AFQEWQcGqzBJP14_jMYzGufVTA65Qpac7Z0Wen8tnI_O1lS8clXU3rRAYkjUEuuWX7Jr0bRQ_WkWsMetuyfrZ_WkoJ9tOQSSeNe4RBo93xcmDQKbZfRpH1zHXfSDPTIZZuDv1rotQsCVWJH1neMWDgi5-SKn9JR1Nv_UGjR" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/20 to-transparent mix-blend-overlay"></div>
+        </div>
+        <div className="absolute -bottom-6 -right-6 bg-emerald-950 text-emerald-50 px-6 py-3 rounded-xl font-bold tracking-widest uppercase shadow-xl transform rotate-3 z-20 text-sm">
+          Preparation
         </div>
       </div>
 
-      {/* Hero Visual Card */}
-      <div className="lg:col-span-6 order-1 lg:order-2 flex justify-center py-12 lg:py-0">
-        <div className="relative group">
-          <div className="absolute inset-0 bg-emerald-400/20 rounded-full blur-[80px] group-hover:bg-emerald-400/30 transition-all duration-700 animate-pulse"></div>
-          <div className="glass-panel bg-white/50 backdrop-blur-3xl p-12 md:p-20 rounded-[4rem] border border-white/80 shadow-2xl relative z-10 hover:scale-105 transition-transform duration-700 overflow-hidden">
-    
-            <img src="/blulagoonbox.png" alt="Mocktail Box" className="w-full max-w-[320px] h-auto drop-shadow-[0_20px_50px_rgba(6,78,59,0.3)] rotate-12 group-hover:rotate-0 transition-all duration-1000" />
-            <div className="mt-12 text-center">
-              <p className="font-black italic text-4xl text-emerald-950 tracking-tighter">NINJIRO✧</p>
-              <div className="w-12 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
-            </div>
-          </div>
+      <div className="w-full md:w-7/12 relative z-10 md:pl-12">
+        <div className="glass-panel bg-emerald-50/50 backdrop-blur-2xl rounded-[3rem] p-8 md:p-12 border border-emerald-900/5 shadow-xl relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+          <h3 className="text-4xl md:text-5xl font-black italic uppercase text-emerald-950 mb-4 tracking-tighter">Empty</h3>
+          <div className="w-12 h-1 bg-emerald-500 rounded-full mb-6"></div>
+          <p className="text-xl text-emerald-900/70 leading-relaxed font-medium">
+            Tear open a single-serve sachet and pour into your favorite glass. The foundation of flavor begins with the finest botanical extracts, carefully preserved for this precise moment.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    {/* Step 02 */}
+    <article className="relative flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-24">
+      <div className="absolute -right-8 md:-right-24 top-0 md:-top-16 text-[8rem] md:text-[14rem] font-black text-emerald-50 select-none z-0 tracking-tighter">02</div>
+      
+      <div className="w-full md:w-6/12 relative z-10 group">
+        <div className="aspect-square md:aspect-[4/3] rounded-[2rem] overflow-hidden shadow-2xl relative ml-auto">
+          <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Hydration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFoewPJKDCpdx1WIvxotYHlIN154t4zIqTWaUVceSDrI6wTYHMQH5Wy0Oo0a98TGAk-5rSNZJGCGInzsZ472nsvHJJVLForPFz2klYNVfmlcLqtu1fB-BNm1zFlRVwWL0g3M3UqGHoser9ESYL8dBtZvBGu2Rhu97TSBw7GeYD6Zq_smDBPWJP_cpiZG_7tRWwgc30ewa65Vbvc7Fpzwt_pqguW80QdAp4klRLZ-qae5A3Csu6DiuqnYejpqWl5CAMyrGADOyctP1I" />
+          <div className="absolute inset-0 bg-gradient-to-bl from-white/20 to-transparent"></div>
+        </div>
+        <div className="absolute -top-6 -left-6 bg-teal-800 text-teal-50 px-6 py-3 rounded-xl font-bold tracking-widest uppercase shadow-xl transform -rotate-2 z-20 text-sm">
+          Hydration
         </div>
       </div>
 
-      {/* Detail Cards 2 & 3 */}
-      <div className="lg:col-span-3 space-y-8 order-3 lg:order-3">
-        <div className="glass-panel bg-white/40 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-xl hover:rotate-2 transition-all duration-500 group">
-          <div className="w-14 h-14 bg-cyan-600 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-cyan-600/20 group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined text-2xl">balance</span>
-          </div>
-          <h3 className="text-2xl font-black text-emerald-950 tracking-tight mb-4">Precision</h3>
-          <p className="text-sm font-medium text-emerald-900/60 leading-relaxed">
-            Meticulously calibrated acidity-to-sweetness ratios that replicate the complexity of elite bar craftsmanship.
-          </p>
-        </div>
-        
-        <div className="glass-panel bg-white/40 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-xl hover:-rotate-1 transition-all duration-500 group">
-          <div className="w-14 h-14 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined text-2xl">bolt</span>
-          </div>
-          <h3 className="text-2xl font-black text-emerald-950 tracking-tight mb-4">Tempo</h3>
-          <p className="text-sm font-medium text-emerald-900/60 leading-relaxed">
-            Artistry in every shake. Transform standard water into a professional botanical experience in under 30 seconds.
+      <div className="w-full md:w-6/12 relative z-10 md:pr-12 text-left md:text-right flex flex-col md:items-end">
+        <div className="bg-emerald-50 rounded-[3rem] p-8 md:p-12 relative overflow-hidden border border-emerald-900/5 shadow-xl">
+          <h3 className="text-4xl md:text-5xl font-black italic uppercase text-teal-900 mb-4 tracking-tighter">Add</h3>
+          <div className="w-12 h-1 bg-teal-500 rounded-full mb-6 md:ml-auto"></div>
+          <p className="text-xl text-emerald-900/70 leading-relaxed font-medium">
+            Just add 6oz of chilled water and a generous handful of crisp ice cubes. Watch as the botanicals awaken, blooming instantly upon contact with hydration.
           </p>
         </div>
       </div>
-    </div>
+    </article>
+
+    {/* Step 03 */}
+    <article className="relative flex flex-col items-center max-w-5xl mx-auto text-center mt-12 md:mt-24">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[12rem] md:text-[20rem] font-black text-emerald-50 select-none z-0 tracking-tighter pointer-events-none">03</div>
+      
+      <div className="glass-panel bg-white/80 backdrop-blur-3xl rounded-[4rem] p-12 md:p-20 border border-emerald-900/10 shadow-2xl relative z-10 w-full overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-teal-400/10"></div>
+        <div className="relative z-20 max-w-2xl mx-auto">
+          <div className="absolute -top-4 -left-8 bg-amber-400 text-amber-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest transform -rotate-12 shadow-md">Tart</div>
+          <div className="absolute top-12 -right-12 bg-emerald-400 text-emerald-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest transform rotate-6 shadow-md">Sparkling</div>
+          
+          <h3 className="text-5xl md:text-6xl font-black italic uppercase text-emerald-950 mb-8 tracking-tighter">Shake & Sip</h3>
+          <p className="text-2xl text-emerald-900/70 leading-relaxed mb-12 font-medium">
+            Shake or stir vigorously for 10 seconds, garnish, and enjoy the complex symphony of flavors. A masterpiece in your hand, crafted by you.
+          </p>
+          
+          <a href="#flavors" className="inline-block bg-emerald-950 text-white px-10 py-5 rounded-full font-black tracking-widest uppercase text-sm shadow-xl hover:bg-emerald-800 transition-all duration-300 transform hover:-translate-y-1">
+            Experience The Collection
+          </a>
+        </div>
+      </div>
+
+      <div className="absolute -bottom-16 -right-8 md:-right-16 w-48 md:w-64 aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl z-30 transform rotate-6 hidden sm:block border-8 border-white">
+        <img className="w-full h-full object-cover" alt="Garnish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa-e0nMC1kQCZ6A0KjUSmmtVZHhIul7iCWdYXT6FyBNJRN8D3cdJCKugiA0AdTCvQzloKX137MncG9WJJ8sRWc60JpleHZi9spS7dWQ_t6ojBXuAIiMMrPwptoGKhR5i3K9IJUVNaIj01Nf7v8HleuRhBXXNqJ5JdTdNXWysd21ogjrDl4gML-cACMgKvabqnmixVsLa_a0v9wReGQ6q4AjWO20cjkgE2GES0c22gMyvid1QRigmaeDWI5-lLYFwY3quSCdfWHhXvX" />
+      </div>
+    </article>
   </div>
 </section>
-{/**/}
 <section className="py-24 px-6 md:px-12 bg-linear-to-br from-[#f0fdf6] to-[#e0f2fe] relative overflow-hidden" id="reviews">
   {/* Background decorative elements */}
   <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-emerald-300/40 blur-[100px] rounded-full pointer-events-none"></div>
@@ -456,7 +446,7 @@ export default function Home() {
 
     {/* Bottom Footer */}
     <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-emerald-500/60 text-xs font-bold tracking-widest uppercase">
-      <p>© 2026 NINJIRO✧. Crafted with care.</p>
+      <p>© 2026 Ninjaro✧. Crafted with care.</p>
       <div className="flex gap-6">
         <a href="#" className="hover:text-emerald-300 transition-colors">Privacy</a>
         <a href="#" className="hover:text-emerald-300 transition-colors">Terms</a>

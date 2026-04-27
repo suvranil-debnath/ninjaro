@@ -66,7 +66,7 @@ export default function ProfilePage() {
           <div className="w-10 h-10 rounded-full bg-white/50 backdrop-blur-md border border-emerald-900/10 flex items-center justify-center group-hover:bg-emerald-900 group-hover:text-white transition-all">
             <span className="material-symbols-outlined text-xl">arrow_back</span>
           </div>
-          <span className="font-black italic text-2xl tracking-tighter">NINJIRO✧</span>
+          <span className="font-black italic text-2xl tracking-tighter">Ninjaro✧</span>
         </Link>
       </nav>
 
@@ -226,7 +226,7 @@ export default function ProfilePage() {
         {/* Bottom Decorative Section */}
         <section className="pt-24 pb-12 flex flex-col items-center gap-8 opacity-20 pointer-events-none">
           <div className="w-px h-32 bg-linear-to-b from-emerald-900 to-transparent"></div>
-          <span className="font-limelight text-8xl md:text-9xl text-emerald-900/10 select-none">NINJIRO</span>
+          <span className="font-limelight text-8xl md:text-9xl text-emerald-900/10 select-none">Ninjaro</span>
         </section>
       </main>
     </div>
