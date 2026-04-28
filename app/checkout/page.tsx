@@ -76,7 +76,7 @@ export default function CheckoutPage() {
         {step < 3 ? (
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
             {/* Left Column: Order Summary */}
-            <div className="lg:w-2/5 order-2 lg:order-1">
+            <div className="lg:w-2/5 order-1">
               <div className="glass-panel bg-white/40 backdrop-blur-3xl p-8 md:p-10 rounded-4xl border border-white/60 shadow-2xl sticky top-12 space-y-8">
                 <h3 className="text-2xl font-black italic uppercase tracking-tight">Order Summary</h3>
                 <div className="space-y-6">
@@ -121,7 +121,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Right Column: Forms */}
-            <div className="lg:w-3/5 order-1 lg:order-2 space-y-12">
+            <div className="lg:w-3/5 order-2 space-y-12">
               {step === 1 && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-700">
                   <div className="space-y-6">
@@ -191,8 +191,9 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="flex justify-end">
-                    <button onClick={() => setStep(2)} className="w-full md:w-auto bg-emerald-900 text-white px-12 py-4 rounded-full font-black uppercase tracking-widest hover:bg-emerald-800 transition-all shadow-xl shadow-emerald-900/20 active:scale-95">
-                      Continue to Payment
+                    <button onClick={() => setStep(2)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-emerald-900 text-white px-12 py-4 rounded-full font-black uppercase tracking-widest hover:bg-emerald-800 transition-all shadow-xl shadow-emerald-900/20 active:scale-95">
+                      Payment
+                      <span className="material-symbols-outlined text-xl">arrow_forward</span>
                     </button>
                   </div>
                 </div>

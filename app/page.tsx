@@ -205,6 +205,9 @@ export default function Home() {
     </div>
 
     <button 
+      onClick={() => {
+        document.getElementById('flavors')?.scrollIntoView({ behavior: 'smooth' });
+      }}
       className="font-poppins bg-gray-900 text-white px-8 py-3 rounded-full text-base font-bold tracking-widest shadow-lg hover:bg-gray-800 active:scale-95 transform transition-all duration-300 z-10 -mt-10 md:-mt-30 md:-mr-10"
     >
       Buy Now
@@ -324,9 +327,15 @@ export default function Home() {
             Shake or stir vigorously for 10 seconds, garnish, and enjoy the complex symphony of flavors. A masterpiece in your hand, crafted by you.
           </p>
           
-          <a href="#flavors" className="inline-block bg-emerald-950 text-white px-10 py-5 rounded-full font-black tracking-widest uppercase text-sm shadow-xl hover:bg-emerald-800 transition-all duration-300 transform hover:-translate-y-1">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('flavors')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="inline-block bg-emerald-950 text-white px-10 py-5 rounded-full font-black tracking-widest uppercase text-sm shadow-xl hover:bg-emerald-800 transition-all duration-300 transform hover:-translate-y-1"
+          >
             Experience The Collection
-          </a>
+          </button>
         </div>
       </div>
 
